@@ -67,6 +67,92 @@ aws bedrock-agentcore-runtime invoke-agent-runtime \
   --region us-west-2
 ```
 
+## Transforming an Existing Agent
+
+To deploy an existing agent (built with Strands, LangGraph, or another framework) to AgentCore Runtime, wrap it with the `BedrockAgentCoreApp`:
+
+### Transformation Checklist
+
+1. **Add runtime dependency** to `requirements.txt`:
+   ```
+   bedrock-agentcore
+   strands-agents       # or your framework
+   ```
+
+2. **Add runtime import**:
+   ```python
+   from bedrock_agentcore.runtime import BedrockAgentCoreApp
+   ```
+
+3. **Initialize the application**:
+   ```python
+   app = BedrockAgentCoreApp()
+   ```
+
+4. **Decorate the main entrypoint** with `@app.entrypoint`:
+   ```python
+   @app.entrypoint
+   def handler(event, context):
+       # Your existing agent logic here
+       return agent.invoke(event)
+   ```
+
+5. **Add the application runner**:
+   ```python
+   if __name__ == "__main__":
+       app.run()
+   ```
+
+### Complete Transformation Example
+
+**Before** (standalone Strands agent):
+```python
+from strands import Agent
+
+agent = Agent(system_prompt="You are a helpful assistant.")
+response = agent("Hello!")
+```
+
+**After** (Runtime-compatible):
+```python
+from strands import Agent
+from bedrock_agentcore.runtime import BedrockAgentCoreApp
+
+app = BedrockAgentCoreApp()
+agent = Agent(system_prompt="You are a helpful assistant.")
+
+@app.entrypoint
+def handler(event, context):
+    user_input = event.get("input", "")
+    return agent(user_input)
+
+if __name__ == "__main__":
+    app.run()
+```
+
+### `@app.entrypoint` vs `@app.handler()`
+
+Both decorators register the main request handler. Use `@app.entrypoint` for simple synchronous handlers and `@app.handler()` for async handlers with streaming support:
+
+| Decorator | Use Case |
+|-----------|----------|
+| `@app.entrypoint` | Synchronous, request-response agents |
+| `@app.handler()` | Async agents, streaming, long-running tasks |
+
+### Alternative: AgentCore CLI Deployment
+
+The AgentCore CLI provides a streamlined deployment experience:
+
+```bash
+# Install the CLI
+npm install -g @aws/agentcore
+
+# Deploy (builds container, pushes to ECR, creates runtime)
+agentcore deploy
+```
+
+The CLI automates containerization, ECR push, and runtime creation. For manual control, use the AWS CLI workflow below.
+
 ## Core Concepts
 
 ### Runtime → Version → Endpoint
@@ -163,6 +249,7 @@ For production deployment architecture, detailed internals, and advanced pattern
 - **[Memory Service](../memory/README.md)**: Short-term (multi-turn) + long-term (cross-session) conversation memory
 - **[Identity Service](../identity/README.md)**: Credential providers, Token Vault, OAuth lifecycle management
 - **[Observability Service](../observability/README.md)**: OpenTelemetry tracing, CloudWatch metrics, X-Ray integration
+- **[Agent Registry](../registry/README.md)**: Catalog, discover, and govern deployed agents and tools
 
 ## References
 

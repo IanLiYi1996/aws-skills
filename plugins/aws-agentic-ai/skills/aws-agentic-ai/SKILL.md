@@ -2,7 +2,7 @@
 name: aws-agentic-ai
 aliases:
   - bedrock-agentcore
-description: AWS Bedrock AgentCore comprehensive expert for deploying and managing all AgentCore services. Use when working with Gateway, Runtime, Memory, Identity, or any AgentCore component. Covers MCP target deployment, credential management, schema optimization, runtime configuration, memory management, and identity services.
+description: This skill should be used when the user works with any AWS Bedrock AgentCore service including Gateway, Runtime, Memory, Identity, Code Interpreter, Browser, Observability, Agent Registry, Evaluations, or any AgentCore component. This skill should also be used when the user asks to "create a registry", "register an MCP server", "search agent registry", "approve registry record", "sync MCP server", "discover agents and tools", "evaluate agent", "create evaluator", "set up online evaluation", "deploy agent to runtime", "create gateway target", or "manage agent credentials".
 context: fork
 model: sonnet
 skills:
@@ -10,6 +10,9 @@ skills:
 allowed-tools:
   - mcp__aws-mcp__*
   - mcp__awsdocs__*
+  - mcp__acdocs__search_agentcore_docs
+  - mcp__acdocs__fetch_agentcore_doc
+  - Bash(aws bedrock-agentcore *)
   - Bash(aws bedrock-agentcore-control *)
   - Bash(aws bedrock-agentcore-runtime *)
   - Bash(aws bedrock *)
@@ -26,15 +29,19 @@ hooks:
 
 # AWS Bedrock AgentCore
 
-AWS Bedrock AgentCore provides a complete platform for deploying and scaling AI agents with seven core services. This skill guides you through service selection, deployment patterns, and integration workflows using AWS CLI.
+AWS Bedrock AgentCore provides a complete platform for deploying and scaling AI agents with nine core services. This skill covers service selection, deployment patterns, and integration workflows using AWS CLI.
 
 ## AWS Documentation Requirement
 
-Always verify AWS facts using MCP tools (`mcp__aws-mcp__*` or `mcp__*awsdocs*__*`) before answering. The `aws-mcp-setup` dependency is auto-loaded — if MCP tools are unavailable, guide the user through that skill's setup flow.
+Always verify AWS facts using MCP tools before answering. Two documentation sources are available:
+- **AgentCore-specific docs** (`mcp__acdocs__*`) — bundled with this plugin, provides `search_agentcore_docs` and `fetch_agentcore_doc` for AgentCore documentation
+- **General AWS docs** (`mcp__aws-mcp__*` or `mcp__*awsdocs*__*`) — loaded via the `aws-mcp-setup` dependency for broader AWS documentation
+
+Prefer the AgentCore docs MCP for AgentCore-specific questions. If MCP tools are unavailable, guide the user through the `aws-mcp-setup` skill's setup flow.
 
 ## When to Use This Skill
 
-Use this skill when you need to:
+Applicable scenarios:
 - Deploy REST APIs as MCP tools for AI agents (Gateway)
 - Execute agents in serverless runtime (Runtime)
 - Add conversation memory to agents (Memory)
@@ -42,6 +49,8 @@ Use this skill when you need to:
 - Enable agents to execute code securely (Code Interpreter)
 - Allow agents to interact with websites (Browser)
 - Monitor and trace agent performance (Observability)
+- Catalog, discover, and govern AI agents, MCP servers, and tools (Agent Registry)
+- Evaluate agent quality with LLM-as-a-Judge scoring (Evaluations)
 
 ## Available Services
 
@@ -54,6 +63,8 @@ Use this skill when you need to:
 | **Code Interpreter** | Secure code execution in sandboxes | [`services/code-interpreter/README.md`](services/code-interpreter/README.md) |
 | **Browser** | Web automation and scraping | [`services/browser/README.md`](services/browser/README.md) |
 | **Observability** | Tracing and monitoring | [`services/observability/README.md`](services/observability/README.md) |
+| **Agent Registry** | Catalog, discover, and govern agents/tools (Preview) | [`services/registry/README.md`](services/registry/README.md) |
+| **Evaluations** | Automated agent quality assessment (LLM-as-a-Judge) | [`services/evaluations/README.md`](services/evaluations/README.md) |
 
 ## Common Workflows
 
@@ -79,6 +90,28 @@ Use this skill when you need to:
 3. Rotate credentials quarterly through credential provider updates
 4. Monitor usage with CloudWatch metrics
 
+### Discovering Agents and Tools (Agent Registry)
+
+**MANDATORY - READ DETAILED DOCUMENTATION**: See [`services/registry/README.md`](services/registry/README.md) for complete Agent Registry guide including governance workflows, MCP endpoint configuration, and sync setup.
+
+**Quick Workflow**:
+1. Create a registry to catalog your organization's AI resources
+2. Register resources (MCP servers, agents, skills, custom) with descriptive metadata
+3. Submit records for approval (auto-approve for dev, manual for production)
+4. Search and discover approved resources via CLI or MCP endpoint
+
+> **Note**: Agent Registry is in Preview. Available in us-east-1, us-west-2, eu-west-1, ap-northeast-1, ap-southeast-2.
+
+### Evaluating Agent Quality
+
+**MANDATORY - READ DETAILED DOCUMENTATION**: See [`services/evaluations/README.md`](services/evaluations/README.md) for complete Evaluations guide including built-in/custom evaluators, online/on-demand modes, and IAM setup.
+
+**Quick Workflow**:
+1. Instrument the agent with OpenTelemetry (ADOT) for trace collection
+2. Create evaluators (use built-in like `Builtin.Helpfulness` or create custom)
+3. Set up online evaluation with sampling rate and data source
+4. Monitor scores in CloudWatch dashboards; investigate low-scoring sessions
+
 ### Monitoring Agents
 
 **MANDATORY - READ DETAILED DOCUMENTATION**: See [`services/observability/README.md`](services/observability/README.md) for comprehensive monitoring setup.
@@ -98,7 +131,14 @@ For detailed documentation on each AgentCore service, see the following resource
 - **Deployment Strategies**: [`services/gateway/deployment-strategies.md`](services/gateway/deployment-strategies.md)
 - **Troubleshooting**: [`services/gateway/troubleshooting-guide.md`](services/gateway/troubleshooting-guide.md)
 
-### Runtime, Memory, Identity, Code Interpreter, Browser, Observability
+### Agent Registry Service
+- **Overview**: [`services/registry/README.md`](services/registry/README.md)
+- **Getting Started**: [`services/registry/getting-started.md`](services/registry/getting-started.md)
+- **MCP Endpoint Guide**: [`services/registry/mcp-endpoint.md`](services/registry/mcp-endpoint.md)
+- **Governance Workflows**: [`services/registry/governance-workflows.md`](services/registry/governance-workflows.md)
+- **Sync Configuration**: [`services/registry/sync-configuration.md`](services/registry/sync-configuration.md)
+
+### Runtime, Memory, Identity, Code Interpreter, Browser, Observability, Evaluations
 Each service has comprehensive documentation in its respective directory:
 - [`services/runtime/README.md`](services/runtime/README.md)
 - [`services/memory/README.md`](services/memory/README.md)
@@ -106,6 +146,7 @@ Each service has comprehensive documentation in its respective directory:
 - [`services/code-interpreter/README.md`](services/code-interpreter/README.md)
 - [`services/browser/README.md`](services/browser/README.md)
 - [`services/observability/README.md`](services/observability/README.md)
+- [`services/evaluations/README.md`](services/evaluations/README.md)
 
 ### Advanced Runtime & OAuth References
 
@@ -134,6 +175,8 @@ Production-ready templates in [`scripts/`](scripts/) for common deployment patte
 For patterns and best practices that span multiple AgentCore services:
 
 - **Credential Management**: [`cross-service/credential-management.md`](cross-service/credential-management.md) - Unified credential patterns, security practices, rotation procedures
+- **Registry Integration**: [`cross-service/registry-integration.md`](cross-service/registry-integration.md) - Cross-service patterns with Gateway, Identity, Runtime
+- **Security & Resource Policies**: [`cross-service/security-resource-policies.md`](cross-service/security-resource-policies.md) - Resource-based policies, cross-account access, VPC/IP restrictions
 
 ## Additional Resources
 
