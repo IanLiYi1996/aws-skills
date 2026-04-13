@@ -2,7 +2,7 @@
 name: aws-agentic-ai
 aliases:
   - bedrock-agentcore
-description: This skill should be used when the user works with any AWS Bedrock AgentCore service including Gateway, Runtime, Memory, Identity, Code Interpreter, Browser, Observability, Agent Registry, Evaluations, or any AgentCore component. This skill should also be used when the user asks to "create a registry", "register an MCP server", "search agent registry", "approve registry record", "sync MCP server", "discover agents and tools", "evaluate agent", "create evaluator", "set up online evaluation", "deploy agent to runtime", "create gateway target", or "manage agent credentials".
+description: AWS Bedrock AgentCore comprehensive expert for deploying and managing AI agents at scale. Use when working with any AgentCore service including Gateway, Runtime, Memory, Identity, Code Interpreter, Browser, Observability, Agent Registry, or Evaluations. Covers agent deployment, MCP tool integration, credential management, agent discovery, governance workflows, and automated quality assessment. Essential when user mentions AgentCore, agent runtime, agent registry, agent evaluation, MCP gateway, deploy agent, register MCP server, discover agents, evaluate agent quality, agent credentials, or wants to build, deploy, catalog, or monitor AI agents on AWS.
 context: fork
 model: sonnet
 skills:
@@ -31,6 +31,8 @@ hooks:
 
 AWS Bedrock AgentCore provides a complete platform for deploying and scaling AI agents with nine core services. This skill covers service selection, deployment patterns, and integration workflows using AWS CLI.
 
+**How to use this skill**: Identify the service(s) the user needs from the table below, then read the corresponding service README before responding. For cross-service patterns (credentials, security, registry integration), check the Cross-Service Resources section. Verify AWS-specific details using the MCP documentation tools.
+
 ## AWS Documentation Requirement
 
 Always verify AWS facts using MCP tools before answering. Two documentation sources are available:
@@ -38,19 +40,6 @@ Always verify AWS facts using MCP tools before answering. Two documentation sour
 - **General AWS docs** (`mcp__aws-mcp__*` or `mcp__*awsdocs*__*`) — loaded via the `aws-mcp-setup` dependency for broader AWS documentation
 
 Prefer the AgentCore docs MCP for AgentCore-specific questions. If MCP tools are unavailable, guide the user through the `aws-mcp-setup` skill's setup flow.
-
-## When to Use This Skill
-
-Applicable scenarios:
-- Deploy REST APIs as MCP tools for AI agents (Gateway)
-- Execute agents in serverless runtime (Runtime)
-- Add conversation memory to agents (Memory)
-- Manage API credentials and authentication (Identity)
-- Enable agents to execute code securely (Code Interpreter)
-- Allow agents to interact with websites (Browser)
-- Monitor and trace agent performance (Observability)
-- Catalog, discover, and govern AI agents, MCP servers, and tools (Agent Registry)
-- Evaluate agent quality with LLM-as-a-Judge scoring (Evaluations)
 
 ## Available Services
 
@@ -70,21 +59,19 @@ Applicable scenarios:
 
 ### Deploying a Gateway Target
 
-**MANDATORY - READ DETAILED DOCUMENTATION**: See [`services/gateway/README.md`](services/gateway/README.md) for complete Gateway setup guide including deployment strategies, troubleshooting, and IAM configuration.
+Read [`services/gateway/README.md`](services/gateway/README.md) before implementing — Gateway setup involves deployment strategies, IAM, and auth choices that vary significantly by use case.
 
-**Quick Workflow**:
 1. Upload OpenAPI schema to S3
 2. *(API Key auth only)* Create credential provider and store API key
 3. Create gateway target linking schema (and credentials if using API key)
 4. Verify target status and test connectivity
 
-> **Note**: Credential provider is only needed for API key authentication. Lambda targets use IAM roles, and MCP servers use OAuth.
+> Credential provider is only needed for API key authentication. Lambda targets use IAM roles, and MCP servers use OAuth.
 
 ### Managing Credentials
 
-**MANDATORY - READ DETAILED DOCUMENTATION**: See [`cross-service/credential-management.md`](cross-service/credential-management.md) for unified credential management patterns across all services.
+Read [`cross-service/credential-management.md`](cross-service/credential-management.md) first — credential patterns differ across services and getting them wrong causes hard-to-debug auth failures.
 
-**Quick Workflow**:
 1. Use Identity service credential providers for all API keys
 2. Link providers to gateway targets via ARN references
 3. Rotate credentials quarterly through credential provider updates
@@ -92,21 +79,19 @@ Applicable scenarios:
 
 ### Discovering Agents and Tools (Agent Registry)
 
-**MANDATORY - READ DETAILED DOCUMENTATION**: See [`services/registry/README.md`](services/registry/README.md) for complete Agent Registry guide including governance workflows, MCP endpoint configuration, and sync setup.
+Read [`services/registry/README.md`](services/registry/README.md) first — the registry has governance workflows, MCP endpoint options, and sync modes that affect how records become discoverable.
 
-**Quick Workflow**:
 1. Create a registry to catalog your organization's AI resources
 2. Register resources (MCP servers, agents, skills, custom) with descriptive metadata
 3. Submit records for approval (auto-approve for dev, manual for production)
 4. Search and discover approved resources via CLI or MCP endpoint
 
-> **Note**: Agent Registry is in Preview. Available in us-east-1, us-west-2, eu-west-1, ap-northeast-1, ap-southeast-2.
+> Agent Registry is in Preview. Available in us-east-1, us-west-2, eu-west-1, ap-northeast-1, ap-southeast-2.
 
 ### Evaluating Agent Quality
 
-**MANDATORY - READ DETAILED DOCUMENTATION**: See [`services/evaluations/README.md`](services/evaluations/README.md) for complete Evaluations guide including built-in/custom evaluators, online/on-demand modes, and IAM setup.
+Read [`services/evaluations/README.md`](services/evaluations/README.md) first — evaluators, scoring modes, and IAM setup vary between online monitoring and on-demand testing.
 
-**Quick Workflow**:
 1. Instrument the agent with OpenTelemetry (ADOT) for trace collection
 2. Create evaluators (use built-in like `Builtin.Helpfulness` or create custom)
 3. Set up online evaluation with sampling rate and data source
@@ -114,39 +99,16 @@ Applicable scenarios:
 
 ### Monitoring Agents
 
-**MANDATORY - READ DETAILED DOCUMENTATION**: See [`services/observability/README.md`](services/observability/README.md) for comprehensive monitoring setup.
+Read [`services/observability/README.md`](services/observability/README.md) for the full monitoring setup — observability configuration depends on your Runtime protocol and framework choice.
 
-**Quick Workflow**:
 1. Enable observability for agents
 2. Configure CloudWatch dashboards for metrics
 3. Set up alarms for error rates and latency
 4. Use X-Ray for distributed tracing
 
-## Service-Specific Documentation
+## Deep-Dive References
 
-For detailed documentation on each AgentCore service, see the following resources:
-
-### Gateway Service
-- **Overview**: [`services/gateway/README.md`](services/gateway/README.md)
-- **Deployment Strategies**: [`services/gateway/deployment-strategies.md`](services/gateway/deployment-strategies.md)
-- **Troubleshooting**: [`services/gateway/troubleshooting-guide.md`](services/gateway/troubleshooting-guide.md)
-
-### Agent Registry Service
-- **Overview**: [`services/registry/README.md`](services/registry/README.md)
-- **Getting Started**: [`services/registry/getting-started.md`](services/registry/getting-started.md)
-- **MCP Endpoint Guide**: [`services/registry/mcp-endpoint.md`](services/registry/mcp-endpoint.md)
-- **Governance Workflows**: [`services/registry/governance-workflows.md`](services/registry/governance-workflows.md)
-- **Sync Configuration**: [`services/registry/sync-configuration.md`](services/registry/sync-configuration.md)
-
-### Runtime, Memory, Identity, Code Interpreter, Browser, Observability, Evaluations
-Each service has comprehensive documentation in its respective directory:
-- [`services/runtime/README.md`](services/runtime/README.md)
-- [`services/memory/README.md`](services/memory/README.md)
-- [`services/identity/README.md`](services/identity/README.md)
-- [`services/code-interpreter/README.md`](services/code-interpreter/README.md)
-- [`services/browser/README.md`](services/browser/README.md)
-- [`services/observability/README.md`](services/observability/README.md)
-- [`services/evaluations/README.md`](services/evaluations/README.md)
+Each service README (linked in the table above) contains sub-links to getting-started guides, troubleshooting, and advanced topics. Start with the service README and follow pointers from there.
 
 ### Advanced Runtime & OAuth References
 
