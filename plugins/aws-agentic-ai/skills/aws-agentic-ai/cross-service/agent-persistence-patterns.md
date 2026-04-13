@@ -236,10 +236,10 @@ aws bedrock-agentcore-control create-agent-runtime \
 
 ```bash
 # 1. Create file system
-aws s3api create-file-system --bucket <bucket> --region <region>
+aws s3files create-file-system --bucket <bucket-arn> --role-arn <iam-role-arn> --region <region>
 
 # 2. Create mount target (one per AZ)
-aws s3api create-mount-target \
+aws s3files create-mount-target \
   --file-system-id <fs-id> \
   --subnet-id <subnet> \
   --security-groups <sg>
@@ -258,8 +258,8 @@ ls /mnt/s3-config/.claude/skills/
 ### IAM Requirements
 
 Compute role needs:
-- `s3:GetObject`, `s3:PutObject`, `s3:ListBucket` on the config bucket
-- `elasticfilesystem:ClientMount`, `elasticfilesystem:ClientWrite` on the file system
+- `s3:GetObject`, `s3:PutObject`, `s3:ListBucket` on the config bucket (for S3 intelligent read routing)
+- `s3files:ClientMount`, `s3files:ClientWrite` on the file system (for NFS client access)
 
 ### Security
 
@@ -271,7 +271,7 @@ Compute role needs:
 
 - [Runtime Service](../services/runtime/README.md) — Session Storage for AgentCore
 - [Memory Service](../services/memory/README.md) — AgentCore Memory for long-term recall
-- [Credential Management](credential-management.md) — IAM roles for S3/EFS access
+- [Credential Management](credential-management.md) — IAM roles for S3/S3 Files access
 - [S3 Files Documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-files.html)
 - [Claude Agent SDK — Skills](https://code.claude.com/docs/en/agent-sdk/skills)
 - [Claude Agent SDK — CLAUDE.md](https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts)

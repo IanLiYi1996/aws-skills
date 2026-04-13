@@ -49,6 +49,7 @@ Records are automatically approved upon submission. Suitable for development env
 aws bedrock-agentcore-control create-registry \
   --name "dev-registry" \
   --description "Development registry with auto-approval" \
+  --approval-configuration '{"autoApproval": true}' \
   --region us-east-1
 ```
 

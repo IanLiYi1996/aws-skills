@@ -14,7 +14,7 @@ AgentCore Evaluations integrates with agent frameworks (**Strands Agents**, **La
 
 Resources that define how agent output is assessed. Each evaluator has a unique ARN:
 
-- **Built-in**: `arn:aws:bedrock-agentcore:::evaluator/Builtin.Helpfulness` (public, all users)
+- **Built-in**: `arn:aws:bedrock-agentcore:::evaluator/Builtin.Helpfulness` (public, all users — empty region/account is intentional for AWS-managed evaluators)
 - **Custom**: `arn:aws:bedrock-agentcore:<region>:<account>:evaluator/<id>` (private, access-controlled)
 
 ### Evaluation Types
@@ -93,6 +93,8 @@ Continuously monitors deployed agents using live production traffic with configu
 3. **Monitoring and analysis** — aggregated scores in dashboards, quality trends, session investigation
 
 ### Create with AgentCore CLI
+
+> **Prerequisite**: Install the AgentCore CLI with `npm install -g @aws/agentcore`. See [Runtime Service](../runtime/README.md) for details.
 
 ```bash
 agentcore add online-eval \
