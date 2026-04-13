@@ -177,6 +177,7 @@ For patterns and best practices that span multiple AgentCore services:
 - **Credential Management**: [`cross-service/credential-management.md`](cross-service/credential-management.md) - Unified credential patterns, security practices, rotation procedures
 - **Registry Integration**: [`cross-service/registry-integration.md`](cross-service/registry-integration.md) - Cross-service patterns with Gateway, Identity, Runtime
 - **Security & Resource Policies**: [`cross-service/security-resource-policies.md`](cross-service/security-resource-policies.md) - Resource-based policies, cross-account access, VPC/IP restrictions
+- **Agent Deployment with S3 Files**: [`cross-service/agent-persistence-patterns.md`](cross-service/agent-persistence-patterns.md) - Deploy Strands Agents, OpenClaw, Claude Agent SDK on AgentCore with S3 Files and Session Storage
 
 ## Additional Resources
 
